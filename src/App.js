@@ -1,24 +1,48 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Header from './components/Header/Header';
+import Create from './pages/Create/Create';
+import Main from './pages/Main/Main';
+import emojiList from './emojiList.json'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AddContext } from './AddContext';
+
+
 
 function App() {
+  const [posts, setPosts] = useState(() => {
+    const storedPosts = localStorage.getItem('posts');
+    return storedPosts ? JSON.parse(storedPosts) : [{id: 1, name: 'a', data: 'data1', discription: 'opisania1' , selectedEmoji: '🗿'}];
+  });
+  const [title, setTitle] = useState({name: '' , data: '' , discription: '' , selectedEmoji: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEmojis, setSelectedEmojis] = useState('');
+
+  
+  useEffect(() => {
+    localStorage.setItem('posts', JSON.stringify(posts));
+  }, [posts]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserRouter>
+        <AddContext.Provider value={{
+            posts , setPosts,
+            title, setTitle,
+            searchTerm , setSearchTerm,
+            emojiList ,
+            selectedEmojis ,
+            setSelectedEmojis ,
+            }}>
+          <Header />
+          <Routes>
+            <Route path='/' element={<Main />} />
+            <Route path='/create' element={<Create />} />
+          </Routes>
+
+        </AddContext.Provider>
+
+      </BrowserRouter>
+    </>
   );
 }
 
